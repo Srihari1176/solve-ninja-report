@@ -17,10 +17,14 @@ function getTargetDate(): string {
     return args.date;
   }
 
-  // Default to yesterday
+  // Default to yesterday in local time (avoiding UTC timezone shift issues)
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  return yesterday.toISOString().split('T')[0]; // YYYY-MM-DD
+  
+  const year = yesterday.getFullYear();
+  const month = String(yesterday.getMonth() + 1).padStart(2, '0');
+  const day = String(yesterday.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export const CONFIG = {
