@@ -1,0 +1,22 @@
+{
+  "name": "solve-ninja-report",
+  "version": "1.0.0",
+  "description": "Daily Solve Ninja activity report automation",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "report": "npx ts-node src/index.ts",
+    "report:build": "npm run build && node dist/index.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "minimist": "^1.2.8",
+    "playwright": "^1.52.0"
+  },
+  "devDependencies": {
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^22.15.0",
+    "typescript": "^5.8.0",
+    "ts-node": "^10.9.2"
+  }
+}

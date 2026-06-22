@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Generated Reports (Excel & PDF)
+*.xlsx
+*.pdf
+screenshots/
+screenshots_temp/
+
+# Logs
+*.log
+errors.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
