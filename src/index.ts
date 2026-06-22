@@ -21,6 +21,26 @@ async function main(): Promise<void> {
   logInfo(`Screenshots dir: ${CONFIG.SCREENSHOTS_DIR}`);
   console.log('');
 
+  // ─────────────────────────────────────────────────
+  // Step 0: Delete previous report files if they exist
+  // ─────────────────────────────────────────────────
+  if (fs.existsSync(CONFIG.REPORT_FILE)) {
+    try {
+      fs.unlinkSync(CONFIG.REPORT_FILE);
+      logInfo('Deleted previous Excel report file.');
+    } catch (err) {
+      logWarn(`Could not delete previous Excel report: ${(err as Error).message}`);
+    }
+  }
+  if (fs.existsSync(CONFIG.PDF_REPORT_FILE)) {
+    try {
+      fs.unlinkSync(CONFIG.PDF_REPORT_FILE);
+      logInfo('Deleted previous PDF report file.');
+    } catch (err) {
+      logWarn(`Could not delete previous PDF report: ${(err as Error).message}`);
+    }
+  }
+
   try {
     // ─────────────────────────────────────────────────
     // Step 1: Fetch active ninjas from the API
