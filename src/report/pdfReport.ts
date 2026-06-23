@@ -43,29 +43,34 @@ export async function generatePdfReport(
     
     let screenshotCellHtml = '';
     if (base64Img) {
-      screenshotCellHtml = `<img src="${base64Img}" alt="Action Screenshot" />`;
+      screenshotCellHtml = `<div class="screenshot-container"><img src="${base64Img}" alt="Action Screenshot" /></div>`;
     } else {
       const label = action.screenshotPath === 'SCREENSHOT_FAILED' ? 'Capture Failed' : 'N/A';
-      screenshotCellHtml = `<span class="failed-badge">${label}</span>`;
+      screenshotCellHtml = `<div class="screenshot-container"><span class="failed-badge">${label}</span></div>`;
     }
 
     const rowClass = i % 2 === 1 ? 'alt-row' : '';
 
     tableRowsHtml += `
       <tr class="${rowClass}">
-        <td style="text-align: center;">${i + 1}</td>
+        <td class="text-center font-medium text-muted">${i + 1}</td>
         <td>
           <div class="ninja-name">${action.ninjaName}</div>
           <div class="ninja-username">@${action.username}</div>
         </td>
-        <td>${action.location}</td>
+        <td>
+          <span class="location-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            ${action.location}
+          </span>
+        </td>
         <td>
           <a class="profile-link" href="${action.profileUrl}" target="_blank">
             ${action.profileUrl}
           </a>
         </td>
         <td class="action-title">${action.actionTitle}</td>
-        <td style="text-align: center;">${action.actionDate}</td>
+        <td class="text-center text-sm">${action.actionDate}</td>
         <td class="screenshot-cell">${screenshotCellHtml}</td>
       </tr>
     `;
@@ -79,177 +84,238 @@ export async function generatePdfReport(
   <title>Solve Ninja Daily Activity Report</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary: #1FAA64;
+      --primary-light: #E8F6F0;
+      --primary-dark: #16854E;
+      --accent: #2E86AB;
+      --text-main: #1C2321;
+      --text-muted: #606864;
+      --bg-main: #F4F7F6;
+      --card-bg: #FFFFFF;
+      --border-color: #E6EAE8;
+    }
+    
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Outfit', sans-serif;
       margin: 0;
       padding: 0;
-      color: #1C2321;
-      background-color: #FFFFFF;
+      color: var(--text-main);
+      background-color: var(--bg-main);
       -webkit-print-color-adjust: exact;
     }
     
     .container {
-      padding: 24px;
+      padding: 30px 40px;
+      max-width: 100%;
     }
 
-    /* Header styling */
+    /* Modern Glassy Header */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 3px solid #1FAA64;
-      padding-bottom: 12px;
-      margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 24px 32px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      color: white;
+      box-shadow: 0 10px 25px rgba(31, 170, 100, 0.2);
     }
     .header-title h1 {
       margin: 0;
-      font-size: 24px;
-      color: #1FAA64;
+      font-size: 28px;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
     .header-title p {
-      margin: 4px 0 0 0;
-      font-size: 13px;
-      color: #606864;
+      margin: 6px 0 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+      font-weight: 300;
     }
     .header-brand {
       font-weight: 700;
-      font-size: 16px;
-      color: #1FAA64;
-      border: 2px solid #1FAA64;
-      padding: 4px 10px;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 8px 16px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
-    /* Summary section (dashboard metrics style) */
+    /* Sleek Summary Dashboard */
     .summary-section {
-      margin-bottom: 28px;
+      margin-bottom: 36px;
     }
-    .summary-title {
-      font-size: 14px;
+    .section-title {
+      font-size: 18px;
       font-weight: 600;
-      color: #404844;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 4px;
     }
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
+      gap: 20px;
     }
     .summary-card {
-      background-color: #F7F9F8;
-      border-left: 4px solid #1FAA64;
-      padding: 12px 16px;
-      border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      background-color: var(--card-bg);
+      padding: 20px 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
     }
-    .summary-card.accent {
-      border-left-color: #2E86AB;
+    .summary-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--primary);
+    }
+    .summary-card.accent::after {
+      background: var(--accent);
     }
     .summary-card .label {
-      font-size: 11px;
-      color: #606864;
+      font-size: 12px;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 4px;
+      font-weight: 600;
+      margin-bottom: 8px;
     }
     .summary-card .value {
-      font-size: 18px;
+      font-size: 28px;
       font-weight: 700;
-      color: #1C2321;
+      color: var(--text-main);
     }
 
-    /* Table styling */
-    .table-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #404844;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    /* Premium Table Styling */
+    .table-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      border: 1px solid #D0D0D0;
-      font-size: 12px;
-      margin-bottom: 20px;
+      font-size: 13px;
     }
     th {
-      background-color: #1FAA64;
-      color: #FFFFFF;
+      background-color: #FAFCFB;
+      color: var(--text-muted);
       font-weight: 600;
       text-align: left;
-      padding: 10px 8px;
-      border: 1px solid #1FAA64;
+      padding: 16px 12px;
+      border-bottom: 1px solid var(--border-color);
       text-transform: uppercase;
       font-size: 11px;
       letter-spacing: 0.5px;
     }
-    th:first-child {
-      text-align: center;
-    }
     td {
-      padding: 10px 8px;
-      border: 1px solid #E0E4E2;
+      padding: 16px 12px;
+      border-bottom: 1px solid var(--border-color);
       vertical-align: middle;
-      word-wrap: break-word;
+    }
+    tr:last-child td {
+      border-bottom: none;
     }
     .alt-row {
-      background-color: #F7F9F8;
+      background-color: #FAFCFB;
     }
     
     .ninja-name {
       font-weight: 600;
-      color: #1C2321;
+      font-size: 14px;
+      color: var(--text-main);
     }
     .ninja-username {
-      font-size: 10px;
-      color: #707874;
-      margin-top: 2px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .location-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
     }
     .profile-link {
-      color: #0563C1;
-      text-decoration: underline;
+      color: var(--accent);
+      text-decoration: none;
       word-break: break-all;
-      font-size: 11px;
+      font-size: 12px;
+      font-weight: 500;
     }
     .action-title {
       font-weight: 500;
-      color: #1C2321;
-      max-width: 200px;
+      color: var(--text-main);
+      max-width: 220px;
+      line-height: 1.4;
     }
+    .text-center { text-align: center; }
+    .text-sm { font-size: 12px; }
+    .font-medium { font-weight: 500; }
+    .text-muted { color: var(--text-muted); }
     
-    /* Screenshot fitting */
+    /* Elegant Image Thumbnails */
     .screenshot-cell {
       text-align: center;
-      width: 260px;
-      padding: 6px;
+      width: 280px;
+      padding: 8px !important;
     }
-    .screenshot-cell img {
+    .screenshot-container {
+      background: #F8F9FA;
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      display: inline-block;
+    }
+    .screenshot-container img {
       max-width: 250px;
       max-height: 140px;
-      border-radius: 4px;
-      border: 1px solid #D0D0D0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border-radius: 8px;
       display: block;
       margin: 0 auto;
+      object-fit: cover;
     }
     .failed-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      background-color: #FCE8E6;
-      color: #C5221F;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 500;
-      border: 1px solid #FAD2CF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 250px;
+      height: 80px;
+      background-color: #FFF0F0;
+      color: #D32F2F;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px dashed #FFCDD2;
     }
 
     /* Print-specific overrides to avoid mid-row breaks */
@@ -270,20 +336,20 @@ export async function generatePdfReport(
       <div class="header-brand">REAP BENEFIT</div>
     </div>
 
-    <!-- Summary Sheet Contents (Worksheet 1 representation) -->
+    <!-- Summary Dashboard -->
     <div class="summary-section">
-      <div class="summary-title">Report Summary</div>
+      <div class="section-title">Overview Dashboard</div>
       <div class="summary-grid">
         <div class="summary-card">
           <div class="label">Report Date</div>
           <div class="value">${targetDate}</div>
         </div>
         <div class="summary-card accent">
-          <div class="label">Total Actions Found</div>
+          <div class="label">Total Actions Recorded</div>
           <div class="value">${matchedActions.length}</div>
         </div>
         <div class="summary-card accent">
-          <div class="label">Unique Ninjas</div>
+          <div class="label">Unique Ninjas Engaged</div>
           <div class="value">${uniqueNinjas}</div>
         </div>
         <div class="summary-card">
@@ -293,25 +359,27 @@ export async function generatePdfReport(
       </div>
     </div>
 
-    <!-- Daily Report Sheet Contents (Worksheet 2 representation) -->
+    <!-- Data Table -->
     <div class="table-section">
-      <div class="table-title">Daily Activity Details</div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 5%; text-align: center;">S.No</th>
-            <th style="width: 18%;">Name</th>
-            <th style="width: 14%;">Location</th>
-            <th style="width: 25%;">Profile URL</th>
-            <th style="width: 20%;">Action Title</th>
-            <th style="width: 10%; text-align: center;">Action Date</th>
-            <th style="width: 8%; text-align: center;">Screenshot</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tableRowsHtml || '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #707874;">No actions recorded for this date.</td></tr>'}
-        </tbody>
-      </table>
+      <div class="section-title">Daily Activity Details</div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 5%; text-align: center;">S.No</th>
+              <th style="width: 18%;">Ninja Profile</th>
+              <th style="width: 14%;">Location</th>
+              <th style="width: 22%;">Profile Link</th>
+              <th style="width: 20%;">Action Title</th>
+              <th style="width: 10%; text-align: center;">Action Date</th>
+              <th style="width: 11%; text-align: center;">Screenshot Verification</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRowsHtml || '<tr><td colspan="7" class="text-center" style="padding: 40px; color: var(--text-muted);">No actions recorded for this date.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </body>
