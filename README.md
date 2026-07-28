@@ -2,6 +2,22 @@
 
 This repository contains automated scripts for generating daily activity reports and extracting specific data trends for Solve Ninjas.
 
+## Daily Report Generation
+
+This script automates the creation of a daily summary report. It fetches the latest active ninjas, extracts their portfolio details, takes automated screenshots of their profiles, and compiles everything into both an Excel sheet and a PDF report.
+
+### Running the Script
+
+To generate the daily report, simply run:
+```bash
+npm run report
+```
+
+### Outputs
+After the script finishes, it cleans up temporary files and generates two primary reports in the root directory:
+1. **`daily_ninja_report.xlsx`**: An Excel file containing detailed stats, actions, and metadata for the day's active ninjas.
+2. **`daily_ninja_report_[DATE].pdf`**: A formatted PDF report containing visual statistics and screenshots of ninja portfolios.
+
 ## Trend Analysis Data Extraction
 
 The Trend Analysis script allows you to perfectly extract all user actions from the Solve Ninja platform that fall into a specific time window. 
