@@ -7,14 +7,10 @@ export interface ActiveNinja {
   username: string;
   full_name: string;
   city: string | null;
-  last_action_date: string; // e.g., "2026-06-22 19:44:38.715081"
+  last_active_raw: string; // e.g., "2026-06-22 19:44:38.715081"
   user_image: string | null;
-  headline: string | null;
-  summary: string | null;
-  rank: number;
   hours_invested: number;
-  contribution_count: number;
-  recent_rank: number;
+  total_actions: number;
 }
 
 interface LeaderboardResponse {
@@ -34,7 +30,7 @@ interface LeaderboardResponse {
 
 /**
  * Fetch all active ninjas from the API, paginating through results.
- * Implements early termination: stops when a ninja's last_action_date is
+ * Implements early termination: stops when a ninja's last_active_raw is
  * before the target date (since results are sorted newest-first).
  */
 export async function fetchActiveNinjas(): Promise<ActiveNinja[]> {
@@ -49,9 +45,11 @@ export async function fetchActiveNinjas(): Promise<ActiveNinja[]> {
 
     try {
       const url = new URL(CONFIG.ACTIVE_NINJAS_API);
-      url.searchParams.set('days', String(CONFIG.API_DAYS_WINDOW));
+      // get_ninja_listing uses different params, e.g. sort_by=last_active
       url.searchParams.set('page_length', String(CONFIG.API_PAGE_LENGTH));
       url.searchParams.set('start', String(start));
+      url.searchParams.set('sort_by', 'last_active');
+      url.searchParams.set('sort_order', 'desc');
 
       const response = await fetch(url.toString());
 
@@ -71,12 +69,16 @@ export async function fetchActiveNinjas(): Promise<ActiveNinja[]> {
 
       // Process each ninja - check for early termination
       for (const ninja of ninjas) {
-        const ninjaLastDate = extractDatePart(ninja.last_action_date);
+
+        if (ninja.last_active_raw == null) {
+          logWarn("Found ninja with null last_active_raw:");
+          console.log(JSON.stringify(ninja, null, 2));
+          continue; 
+        }
+
+        const ninjaLastDate = extractDatePart(ninja.last_active_raw);
 
         if (ninjaLastDate < CONFIG.TARGET_DATE) {
-          // This ninja's last action is before target date.
-          // Since results are sorted newest-first, all subsequent ninjas
-          // will also be before the target date. STOP.
           logInfo(
             `Early termination: "${ninja.full_name}" last action on ${ninjaLastDate} ` +
             `is before target date ${CONFIG.TARGET_DATE}. Stopping.`
@@ -88,14 +90,14 @@ export async function fetchActiveNinjas(): Promise<ActiveNinja[]> {
         allNinjas.push(ninja);
       }
 
-      if (earlyTermination) {
-        break;
-      }
-
       // Check pagination
-      hasMore = data.data.pagination.has_next;
-      start += CONFIG.API_PAGE_LENGTH;
-      pageNum++;
+      if (earlyTermination) {
+        hasMore = false;
+      } else {
+        hasMore = data.data.pagination.has_next;
+        start += CONFIG.API_PAGE_LENGTH;
+        pageNum++;
+      }
 
       // Small delay to avoid rate limiting
       if (hasMore) {

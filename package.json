@@ -6,6 +6,8 @@
   "scripts": {
     "build": "tsc",
     "report": "npx ts-node src/index.ts",
+    "start": "ts-node src/index.ts",
+    "analyze": "ts-node src/generateAnalysisData.ts --days=30",
     "report:build": "npm run build && node dist/index.js"
   },
   "dependencies": {
@@ -16,7 +18,7 @@
   "devDependencies": {
     "@types/minimist": "^1.2.5",
     "@types/node": "^22.15.0",
-    "typescript": "^5.8.0",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.0"
   }
 }

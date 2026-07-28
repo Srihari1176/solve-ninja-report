@@ -17,7 +17,8 @@ export function sanitizeFilename(name: string): string {
  * Input format: "2026-06-22 19:44:38.715081"
  */
 export function extractDatePart(dateTimeStr: string): string {
-  return dateTimeStr.split(' ')[0]; // "2026-06-22"
+  console.log("extractDatePart received:", dateTimeStr);
+  return dateTimeStr.split(" ")[0];
 }
 
 /**

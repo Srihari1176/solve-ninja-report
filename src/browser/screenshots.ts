@@ -211,6 +211,26 @@ async function captureActionScreenshot(
     await delay(3000);
   }
 
+  logInfo('Waiting for modal contents to finish loading...');
+  try {
+    // Wait for network to be idle to ensure API data and image requests finish
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+  } catch {
+    logWarn('Network idle timeout. Proceeding...');
+  }
+
+  try {
+    // Explicitly wait for all images within the modal to fully load
+    await page.waitForFunction(() => {
+      const modal = document.querySelector('.cmp-action-modal-panel');
+      if (!modal) return true;
+      const images = Array.from(modal.querySelectorAll('img'));
+      return images.every(img => img.complete && img.naturalHeight !== 0);
+    }, { timeout: 10000 });
+  } catch {
+    logWarn('Image load timeout. Proceeding...');
+  }
+
   await delay(1000);
 
   // Screenshot the modal panel

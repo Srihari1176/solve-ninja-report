@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import { CONFIG } from './config';
 import { fetchActiveNinjas, ActiveNinja } from './api/activeNinjas';
 import { fetchPortfolio } from './api/portfolio';
@@ -32,13 +33,21 @@ async function main(): Promise<void> {
       logWarn(`Could not delete previous Excel report: ${(err as Error).message}`);
     }
   }
-  if (fs.existsSync(CONFIG.PDF_REPORT_FILE)) {
-    try {
-      fs.unlinkSync(CONFIG.PDF_REPORT_FILE);
-      logInfo('Deleted previous PDF report file.');
-    } catch (err) {
-      logWarn(`Could not delete previous PDF report: ${(err as Error).message}`);
+
+  try {
+    const files = fs.readdirSync(CONFIG.PROJECT_ROOT);
+    let deletedCount = 0;
+    for (const file of files) {
+      if (file.startsWith('daily_ninja_report') && file.endsWith('.pdf')) {
+        fs.unlinkSync(path.join(CONFIG.PROJECT_ROOT, file));
+        deletedCount++;
+      }
     }
+    if (deletedCount > 0) {
+      logInfo(`Deleted ${deletedCount} previous PDF report file(s).`);
+    }
+  } catch (err) {
+    logWarn(`Could not delete previous PDF reports: ${(err as Error).message}`);
   }
 
   try {

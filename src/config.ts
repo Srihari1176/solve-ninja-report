@@ -32,7 +32,7 @@ export const CONFIG = {
   TARGET_DATE: getTargetDate(),
 
   /** API endpoints */
-  ACTIVE_NINJAS_API: 'https://solveninja.org/api/method/solve_ninja.api.v1.leaderboard.get_top_reviewed_users',
+  ACTIVE_NINJAS_API: 'https://solveninja.org/api/method/solve_ninja.api.v1.ninjas.get_ninja_listing',
   PORTFOLIO_API_BASE: 'https://cmp-api.solveninja.org/portfolio',
 
   /** Website base URL for profile pages */
@@ -48,7 +48,7 @@ export const CONFIG = {
   PROJECT_ROOT: path.resolve(__dirname, '..'),
   SCREENSHOTS_DIR: path.resolve(__dirname, '..', 'screenshots'),
   REPORT_FILE: path.resolve(__dirname, '..', 'daily_ninja_report.xlsx'),
-  PDF_REPORT_FILE: path.resolve(__dirname, '..', 'daily_ninja_report.pdf'),
+  PDF_REPORT_FILE: path.resolve(__dirname, '..', `daily_ninja_report_${getTargetDate()}.pdf`),
   ERROR_LOG_FILE: path.resolve(__dirname, '..', 'errors.log'),
 
   /** Playwright settings */

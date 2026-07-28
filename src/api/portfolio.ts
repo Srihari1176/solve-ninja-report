@@ -56,7 +56,8 @@ export async function fetchPortfolio(username: string): Promise<PortfolioRespons
   const url = `${CONFIG.PORTFOLIO_API_BASE}/${username}`;
 
   try {
-    const response = await fetch(url);
+    // Add a 5-second timeout to prevent long hangs if the API is unreachable
+    const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
 
     if (!response.ok) {
       throw new Error(`Portfolio API returned ${response.status} for ${username}`);
