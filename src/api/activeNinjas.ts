@@ -73,7 +73,7 @@ export async function fetchActiveNinjas(): Promise<ActiveNinja[]> {
         if (ninja.last_active_raw == null) {
           logWarn("Found ninja with null last_active_raw:");
           console.log(JSON.stringify(ninja, null, 2));
-          continue; 
+          continue;
         }
 
         const ninjaLastDate = extractDatePart(ninja.last_active_raw);

@@ -55,20 +55,30 @@ export interface PortfolioResponse {
 export async function fetchPortfolio(username: string): Promise<PortfolioResponse | null> {
   const url = `${CONFIG.PORTFOLIO_API_BASE}/${username}`;
 
-  try {
-    // Add a 5-second timeout to prevent long hangs if the API is unreachable
-    const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      // Add a 5-second timeout to prevent long hangs if the API is unreachable
+      const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
 
-    if (!response.ok) {
-      throw new Error(`Portfolio API returned ${response.status} for ${username}`);
+      if (!response.ok) {
+        throw new Error(`Portfolio API returned ${response.status} for ${username}`);
+      }
+
+      const data = (await response.json()) as PortfolioResponse;
+      logInfo(`Fetched portfolio for "${data.first_name} ${data.last_name}" - ${data.actions.length} actions`);
+      return data;
+
+    } catch (error) {
+      retries--;
+      if (retries === 0) {
+        logError(`Failed to fetch portfolio for ${username} after 3 attempts`, error as Error);
+        return null;
+      }
+      logInfo(`Network issue for ${username}, retrying... (${retries} attempts left)`);
+      // Wait 2 seconds before retrying
+      await new Promise(res => setTimeout(res, 2000));
     }
-
-    const data = (await response.json()) as PortfolioResponse;
-    logInfo(`Fetched portfolio for "${data.first_name} ${data.last_name}" - ${data.actions.length} actions`);
-    return data;
-
-  } catch (error) {
-    logError(`Failed to fetch portfolio for ${username}`, error as Error);
-    return null;
   }
+  return null;
 }

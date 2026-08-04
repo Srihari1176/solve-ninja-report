@@ -36,39 +36,52 @@ export async function fetchCityStats(): Promise<CityStat[]> {
   while (hasMore) {
     logInfo(`Fetching city stats page ${pageNum} (start=${start})...`);
 
-    try {
-      const url = new URL('https://solveninja.org/api/method/solve_ninja.api.v1.marketplace.get_city_wise_ninja_stats');
-      url.searchParams.set('start', String(start));
+    let retries = 3;
+    let success = false;
+    while (retries > 0 && !success) {
+      try {
+        const url = new URL('https://solveninja.org/api/method/solve_ninja.api.v1.marketplace.get_city_wise_ninja_stats');
+        url.searchParams.set('start', String(start));
 
-      const response = await fetch(url.toString(), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+        const response = await fetch(url.toString(), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`API returned status ${response.status}: ${response.statusText}`);
         }
-      });
 
-      if (!response.ok) {
-        throw new Error(`API returned status ${response.status}: ${response.statusText}`);
-      }
+        const data = (await response.json()) as CityStatsResponse;
+        
+        if (!data.data?.result || data.data.result.length === 0) {
+          hasMore = false;
+          success = true;
+          break;
+        }
 
-      const data = (await response.json()) as CityStatsResponse;
-      
-      if (!data.data?.result || data.data.result.length === 0) {
-        break;
+        allStats.push(...data.data.result);
+        
+        const pag = data.data.pagination;
+        if (start + pag.page_length >= pag.total_count) {
+          hasMore = false;
+        } else {
+          start += pag.page_length;
+          pageNum++;
+        }
+        success = true;
+      } catch (error) {
+        retries--;
+        if (retries === 0) {
+          logError(`Failed to fetch city stats page ${pageNum} after 3 attempts`, error as Error);
+          hasMore = false; // Stop completely on terminal error
+        } else {
+          logInfo(`Network issue for city stats page ${pageNum}, retrying... (${retries} attempts left)`);
+          await new Promise(res => setTimeout(res, 2000));
+        }
       }
-
-      allStats.push(...data.data.result);
-      
-      const pag = data.data.pagination;
-      if (start + pag.page_length >= pag.total_count) {
-        hasMore = false;
-      } else {
-        start += pag.page_length;
-        pageNum++;
-      }
-    } catch (error) {
-      logError(`Failed to fetch city stats page ${pageNum}`, error as Error);
-      break;
     }
   }
 

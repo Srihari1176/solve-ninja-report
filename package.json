@@ -5,20 +5,24 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "report": "npx ts-node src/index.ts",
-    "start": "ts-node src/index.ts",
-    "analyze": "ts-node src/generateAnalysisData.ts --days=30",
-    "report:build": "npm run build && node dist/index.js"
+    "report": "npx tsx src/index.ts",
+    "start": "tsx src/index.ts",
+    "analyze": "tsx src/generateAnalysisData.ts --days=30",
+    "report:build": "npm run build && node dist/index.js",
+    "automate": "tsx src/automate.ts"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "exceljs": "^4.4.0",
     "minimist": "^1.2.8",
+    "nodemailer": "^9.0.3",
     "playwright": "^1.52.0"
   },
   "devDependencies": {
     "@types/minimist": "^1.2.5",
     "@types/node": "^22.15.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.23.1",
     "typescript": "^5.8.0"
   }
 }
