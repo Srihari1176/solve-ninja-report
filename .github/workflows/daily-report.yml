@@ -2,9 +2,9 @@ name: Daily Solve Ninja Report
 
 on:
   schedule:
-    # Runs at 12:00 UTC every day
-    # 12:00 UTC is 5:30 PM IST
-    - cron: '0 12 * * *'
+    # Runs at 11:40 UTC every day
+    # 11:40 UTC is 5:10 PM IST
+    - cron: '40 11 * * *'
   
   # Allows you to trigger the workflow manually from the GitHub Actions tab
   workflow_dispatch:
