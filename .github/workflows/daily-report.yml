@@ -2,9 +2,9 @@ name: Daily Solve Ninja Report
 
 on:
   schedule:
-    # Temporary test: runs every 5 minutes to verify scheduled trigger
-    # Revert to original cron '5 12 * * *' (12:05 UTC → 17:35 IST) after testing
-    - cron: '*/5 * * * *'
+    # Runs at 12:20 UTC every day
+    # 12:20 UTC is 5:50 PM IST
+    - cron: '20 12 * * *'
 
   # Allows you to trigger the workflow manually from the GitHub Actions tab
   workflow_dispatch:
